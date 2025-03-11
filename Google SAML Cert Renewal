@@ -1,0 +1,16 @@
+$domainName = “DOMAIN.school.nz”
+$Authentication = “Federated”
+$FederationBrandName = “Google Cloud Identity”
+$IssuerUri = “https://accounts.google.com/o/saml2?idpid=XXXXXXXX”
+$PassiveLogOnUri = “https://accounts.google.com/o/saml2/idp?idpid=XXXXXXXX”
+$ActiveLogOnUri = “https://login.microsoftonline.com/login.srf”
+$LogOffUri = “https://accounts.google.com/o/saml2/idp?idpid=XXXXXXXX”
+$SigningCertificate = “XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXX”
+
+
+Set-MsolDomainFederationSettings -DomainName $domainName -FederationBrandName $FederationBrandName -IssuerUri $IssuerUri -ActiveLogOnUri $ActiveLogOnUri -PassiveLogOnUri $PassiveLogOnUri -LogOffUri $LogOffUri -SigningCertificate $SigningCertificate -PreferredAuthenticationProtocol SAMLP
