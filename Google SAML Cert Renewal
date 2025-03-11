@@ -1,3 +1,5 @@
+Connect-MsolService
+
 $domainName = “DOMAIN.school.nz”
 $Authentication = “Federated”
 $FederationBrandName = “Google Cloud Identity”
