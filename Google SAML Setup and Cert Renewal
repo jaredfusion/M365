@@ -1,0 +1,42 @@
+#change <your domain name> inside the code
+#open powershell
+#move to the folder where you have GoogleIDPMetadata.xml file downloaded from Google Admin.
+#take care that GoogleIDPMetadata.xml includes only a single certificate.
+#always run the common section of the code
+#run section A, if you want to create a new federation config
+#run section B, if you want to change the signing certificate
+
+#common section
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+Install-Module Microsoft.Graph -Scope CurrentUser
+Import-Module Microsoft.Graph
+$domainId = "<your domain name>"
+
+#GoogleIDPMetadata.xml must include only a single certificate
+$xml = [Xml](Get-Content GoogleIDPMetadata.xml)
+$cert = -join $xml.EntityDescriptor.IDPSSODescriptor.KeyDescriptor.KeyInfo.X509Data.X509Certificate.Split()
+$issuerUri = $xml.EntityDescriptor.entityID
+$signinUri = $xml.EntityDescriptor.IDPSSODescriptor.SingleSignOnService | ? { $_.Binding.Contains('Redirect') } | % { $_.Location }
+$signoutUri = "https://accounts.google.com/logout"
+$displayName = "Google Workspace Identity"
+Connect-MGGraph -Scopes "Domain.ReadWrite.All", "Directory.AccessAsUser.All"
+
+# section A - code to create a new federation config
+$domainAuthParams = @{
+  DomainId = $domainId
+  IssuerUri = $issuerUri
+  DisplayName = $displayName
+  ActiveSignInUri = $signinUri
+  PassiveSignInUri = $signinUri
+  SignOutUri = $signoutUri
+  SigningCertificate = $cert
+  PreferredAuthenticationProtocol = "saml"
+  federatedIdpMfaBehavior = "acceptIfMfaDoneByFederatedIdp"
+}
+New-MgDomainFederationConfiguration @domainAuthParams
+
+# section B - code to update only the certificate for a federation config
+Get-MgDomainFederationConfiguration -DomainId $domainId |fl 
+#take note of federated "Id"
+Update-MgDomainFederationConfiguration -DomainId $domainId -SigningCertificate $cert
+#prompt asks to specify InternalDomainFederationId, type the annotaded Id
